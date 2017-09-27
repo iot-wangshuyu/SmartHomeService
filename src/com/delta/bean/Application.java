@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  * @author Shuyu.Wang
  *
  */
-public class Application {
+public class Application { 
 	public Integer id;
 	public String name;
 	public String describes;
