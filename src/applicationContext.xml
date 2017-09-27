@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+
+	<!-- 定义个缺省的控制适配器 -->
+	<bean
+		class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+	<!-- 获取配置文件 -->
+	<bean id="config"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:db-config.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 获取数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName">
+			<value>${db.dirverClass}</value>
+		</property>
+		<property name="url">
+			<value>${db.url}</value>
+		</property>
+		<property name="username">
+			<value>${db.username}</value>
+		</property>
+		<property name="password">
+			<value>${db.password}</value>
+		</property>
+	</bean>
+
+
+	<!-- 时间转换拦截器 -->
+
+	<bean id="converterUtil"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="com.delta.util.TimestampConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 给jdbc模板输入数据 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<bean id="deviceDriverDaoImpl" class="com.delta.dao.impl.DeviceDriverDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="applicationDaoImpl" class="com.delta.dao.impl.ApplicationDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="applicationDeviceDriverDaoImpl" class="com.delta.dao.impl.ApplicationDeviceDriverDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="applicationPositionDaoImpl" class="com.delta.dao.impl.ApplicationPositionDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="applicationSpeedDaoImpl" class="com.delta.dao.impl.ApplicationSpeedDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="applicationDescriptionDaoImpl2" class="com.delta.dao.impl.ApplicationDescriptionDaoImpl2">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="userDaoImpl" class="com.delta.dao.impl.UserDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="installDeviceDriverDaoImpl" class="com.delta.dao.impl.InstallDeviceDriverDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="installDeviceDaoImpl" class="com.delta.dao.impl.InstallDeviceDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="installApplicationDaoImpl" class="com.delta.dao.impl.InstallApplicationDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<bean id="accessDaoImpl" class="com.delta.dao.impl.AccessDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<bean id="installApplicationDeviceDaoImpl" class="com.delta.dao.impl.InstallApplicationDeviceDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+    <bean id="authorDaoImpl" class="com.delta.dao.impl.AuthorDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<!-- 手机端注入dao类 -->
+	<bean id="login" class="com.delta.controller.Login">
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<bean id="logout" class="com.delta.controller.Logout">
+	</bean>
+	<bean id="register" class="com.delta.controller.Register">
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 保存应用 -->
+	<bean id="saveInstallApplication" class="com.delta.controller.SaveInstallApplication">
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+		<property name="installApplicationDeviceDao" ref="installApplicationDeviceDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 下载驱动 -->
+	<bean id="download" class="com.delta.controller.Download">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+		<property name="installDeviceDao" ref="installDeviceDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 引导接口 -->
+	<bean id="find" class="com.delta.controller.Find">
+		<property name="applicationDao" ref="applicationDaoImpl"></property>
+		<property name="applicationSpeedDao" ref="applicationSpeedDaoImpl"></property>
+		<property name="applicationDescriptionDao2" ref="applicationDescriptionDaoImpl2"></property>
+		<property name="applicationDeviceDriverDao" ref="applicationDeviceDriverDaoImpl"></property>
+		<property name="applicationPositionDao" ref="applicationPositionDaoImpl"></property>
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+		<property name="accessDao" ref="accessDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 小贴士 -->
+	<bean id="tips" class="com.delta.controller.Tips">
+	</bean>
+	<!-- 检查驱动是否更新 -->
+	<bean id="comparisonDriverVersion" class="com.delta.controller.ComparisonDriverVersion">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 保存驱动更新 -->
+	<bean id="updateInstallDriver" class="com.delta.controller.UpdateInstallDriver">
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 检查应用插件是否更新 -->
+	<bean id="comparisonApplicationVersion" class="com.delta.controller.ComparisonApplicationVersion">
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+		<property name="applicationDao" ref="applicationDaoImpl"></property>
+	</bean>
+	<!-- 保存应用插件更新 -->
+	<bean id="updateInstallApplication" class="com.delta.controller.UpdateInstallApplication">
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 已经安装的设备驱动 列表 -->
+	<bean id="selectInstallDeviceDriver" class="com.delta.controller.SelectInstallDeviceDriver">
+		<property name="userDao" ref="userDaoImpl"></property>
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 删除已安装设备驱动 -->
+	<bean id="deleteInstallDeviceDriver" class="com.delta.controller.DeleteInstallDeviceDriver">
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 已经安装的设备列表 -->
+	<bean id="selectInstallDevice" class="com.delta.controller.SelectInstallDevice">
+		<property name="userDao" ref="userDaoImpl"></property>
+		<property name="installDeviceDao" ref="installDeviceDaoImpl"></property>
+
+	</bean>
+	<!-- 删除已安装设备 -->
+	<bean id="deleteInstallDevice" class="com.delta.controller.DeleteInstallDevice">
+		<property name="userDao" ref="userDaoImpl"></property>
+		<property name="installDeviceDao" ref="installDeviceDaoImpl"></property>
+	</bean>
+	<!-- 已经安装的应用 列表 -->
+	<bean id="selectInstallApplication" class="com.delta.controller.SelectInstallApplication">
+		<property name="userDao" ref="userDaoImpl"></property>
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+	</bean>
+	<!-- 删除已安装应用 -->
+	<bean id="deleteInstallApplication" class="com.delta.controller.DeleteInstallApplication">
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	<!-- 应用详情 -->
+	<bean id="applicationDetails" class="com.delta.controller.ApplicationDetails">
+		<property name="installApplicationDao" ref="installApplicationDaoImpl"></property>
+	</bean>
+	<!-- 设备详情 -->
+	<bean id="deviceDetails" class="com.delta.controller.DeviceDetails">
+		<property name="installDeviceDao" ref="installDeviceDaoImpl"></property>
+	</bean>
+	<!-- 设备驱动详情 -->
+	<bean id="deviceDriverDetails" class="com.delta.controller.DeviceDriverDetails">
+		<property name="installDeviceDriverDao" ref="installDeviceDriverDaoImpl"></property>
+	</bean>
+
+
+	<!-- 网页端注入dao类 -->
+
+	<!-- 创建应用 -->
+	<bean id="createApplication" class="com.delta.controller.web.CreateApplication">
+		<property name="applicationDao" ref="applicationDaoImpl"></property>
+		<property name="applicationPositionDao" ref="applicationPositionDaoImpl"></property>
+		<property name="applicationSpeedDao" ref="applicationSpeedDaoImpl"></property>
+		<property name="applicationDeviceDriverDao" ref="applicationDeviceDriverDaoImpl"></property>
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 已上创建的应用列表 -->
+	<bean id="findApplication" class="com.delta.controller.web.FindApplication">
+		<property name="applicationDao" ref="applicationDaoImpl"></property>
+	</bean>
+	<!-- 已上传的驱动列表 -->
+	<bean id="findDeviceDriver" class="com.delta.controller.web.FindDeviceDriver">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 查找已经上传设备驱动 -->
+	<bean id="selectDeviceDriver" class="com.delta.controller.web.SelectDeviceDriver">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 更新驱动 -->
+	<bean id="updateDriver" class="com.delta.controller.web.UpdateDriver">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+	</bean>
+	<!-- 更新应用插件 -->
+	<bean id="updateApplication" class="com.delta.controller.web.UpdateApplication">
+		<property name="applicationDao" ref="applicationDaoImpl"></property>
+	</bean>
+	<bean id="uploadDriver" class="com.delta.controller.web.UploadDriver">
+		<property name="deviceDriverDao" ref="deviceDriverDaoImpl"></property>
+	</bean>
+
+	<!-- 查找应用对应的推荐位置 -->
+	<bean id="findApplicationPosition" class="com.delta.controller.web.FindApplicationPosition">
+		<property name="applicationPositionDao" ref="applicationPositionDaoImpl"></property>
+	</bean>
+	<bean id="findApplicationDriver" class="com.delta.controller.web.FindApplicationDriver">
+		<property name="applicationDeviceDriverDao" ref="applicationDeviceDriverDaoImpl"></property>
+	</bean>
+
+
+	<!-- 配置映射响应器，映射响应器会根据请求文件来决定进入到哪个控制器 -->
+	<bean id="urlMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<!-- 手机端接口 -->
+				<prop key="download.do">download</prop><!-- 下载驱动 -->
+				<prop key="login.do">login</prop><!-- 登录 -->
+				<prop key="logout.do">logout</prop><!-- 登出 -->
+				<prop key="register.do">register</prop><!-- 注册 -->
+				<prop key="saveInstallApplication.do">saveInstallApplication</prop><!-- 保存应用 -->
+				<prop key="comparisonDriverVersion.do">comparisonDriverVersion</prop><!-- 检查驱动是否更新 -->
+				<prop key="updateInstallDriver.do">updateInstallDriver</prop><!-- 保存驱动更新 -->
+				<prop key="comparisonApplicationVersion.do">comparisonApplicationVersion</prop><!-- 检查应用插件是否更新 -->
+				<prop key="updateInstallApplication.do">updateInstallApplication</prop><!-- 保存应用插件更新 -->
+				<prop key="selectInstallDevice.do">selectInstallDevice</prop><!-- 已经安装的设备列表 -->
+				<prop key="selectInstallDeviceDriver.do">selectInstallDeviceDriver</prop><!-- 已经安装的设备驱动列表 -->
+				<prop key="selectInstallApplication.do">selectInstallApplication</prop><!-- 已经安装的应用 列表 -->
+				<prop key="applicationDetails.do">applicationDetails</prop><!-- 应用详情接口 -->
+				<prop key="deviceDetails.do">deviceDetails</prop><!-- 设备详情接口 -->
+				<prop key="deviceDriverDetails.do">deviceDriverDetails</prop><!-- 设备驱动详情接口 -->
+				<prop key="deleteInstallApplication.do">deleteInstallApplication</prop><!-- 删除已安装应用 -->
+				<prop key="deleteInstallDeviceDriver.do">deleteInstallDeviceDriver</prop><!-- 删除已安装应用 -->
+				<prop key="deleteInstallDevice.do">deleteInstallDevice</prop><!-- 删除已安装设备 -->
+				<prop key="find.do">find</prop>	<!-- 引导接口 -->
+				<prop key="tips.do">tips</prop>	<!-- 小贴士 -->
+
+				<!-- 网页端接口 -->
+				<prop key="createApplication.do">createApplication</prop><!-- 创建应用 -->
+				<prop key="findApplication.do">findApplication</prop><!-- 已上创建的应用列表 -->
+				<prop key="findDeviceDriver.do">findDeviceDriver</prop><!-- 已上传的驱动列表 -->
+				<prop key="selectDeviceDriver.do">selectDeviceDriver</prop><!-- 查询设备驱动 -->
+				<prop key="updateDriver.do">updateDriver</prop><!-- 更新驱动 -->
+				<prop key="updateApplication.do">updateApplication</prop><!-- 更新应用插件 -->
+				<prop key="uploadDriver.do">uploadDriver</prop><!-- 上传驱动 -->
+				<prop key="findApplicationPosition.do">findApplicationPosition</prop><!--查找应用对应的位置 -->
+				<prop key="findApplicationDriver.do">findApplicationDriver</prop><!--查找应用对应的驱动 -->
+			</props>
+
+		</property>
+	</bean>
+
+	<!-- 配置视图解析器，将ModelAndView及字符串解析为具体的页面 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>
